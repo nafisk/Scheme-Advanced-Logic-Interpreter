@@ -7,14 +7,22 @@ Second Project -- Release 1.0 on May 3 2022
 CSc 335
 Spring 2022
 
-All parts are due by Sunday, May 22, at 23:59.  I ask that each team submit a single document containing the
-developments, proofs and working code, along with tests and the demo requested in Part 3.
+All parts are due by ***Sunday, May 22, at 23:59***.  
+I ask that each team submit a single document containing the developments, proofs and working code, along with tests and the demo requested in Part 3.
 
 ---
 
 ### Part 1
 
-Design a data type suitable for representing infix propositions, as described in my notes for Class 19.
+- [ ] Design a data type suitable for representing infix propositions, as described in my notes for Class 19.
+- [ ] Proofs
+
+- [ ] Input Proposition: ^
+- [ ] Input Proposition: v
+- [ ] Input Proposition: -
+- [ ] Input Proposition: =>
+
+Returns the local equivalent proposition of using ^ and - only in infix notation. 
 
 Give a complete specification and development (including a proof) for a program which inputs a proposition
 which uses and (^), or (v), not (-) and implies (=>) and which returns a logically equivalent proposition
