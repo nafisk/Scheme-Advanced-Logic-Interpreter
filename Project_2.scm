@@ -7,32 +7,69 @@
 ;; Nafis Khan, email: nkhan014@citymail.cuny.edu
 ;; Deepankar Chakraborty, email: dchakra001@citymail.cuny.edu
 
+;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------Helper-----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
 
+; returns true if element is an atom
+(define (atom? x)
+  (and (not (null? x))
+       (not (pair? x))))
+
+
+
+
+;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------Part 1-----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
+
+;-------------makes--------------;
+
+; returns x and y with and(^)
 (define (make-and f s)
   (cons f (cons '^ (cons s '() ))))
 
+; returns x and y with or(v)
 (define (make-or f s)
   (cons f (cons 'v (cons s '() ))))
 
-; draft - 1
+; returns x and y with not(-)
+
+; TRY 1
 ; (define (make-not f)
 ;  (cons '- (cons f '())))
-; TODO - if ! already present, cancel it out
-
-; draft -2
+; TRY 2
 (define (make-not f)
-  (cond ((equal? (car f) -) (cdr f))
+  (cond ((not (atom? f)) (car (cdr f)))
         (else (cons '- (cons f '())))))
 
-
+; returns x and y with implies(=>)
 (define (make-imply f s)
   (cons f (cons '=> (cons s '() ))))
 
 
+;-------------fetch--------------;
+
+(define (first-operand clauses)
+  (car clauses))
+
+(define (second-operand clauses)
+  (caddr clauses))
+
+(define (classifier clauses)
+  (cadr clauses))
 
 
+; TEST
+(define x 2)
+(define y 4)
+(define z (list - 6))
 
-
+(make-and z y)
+(make-or x y)
+(make-not y)
+(make-not z)
+(make-imply x y)
 
 
 ;(define P (make-or 'x 'y))
@@ -59,14 +96,7 @@
 ;(display "\n")
 ;
 ;
-;(define (first-operand clauses)
-;  (car clauses))
-;
-;(define (second-operand clauses)
-;  (caddr clauses))
-;
-;(define (classifier clauses)
-;  (cadr clauses))
+
 ;
 ;(display "Display Infos\n")
 ;
