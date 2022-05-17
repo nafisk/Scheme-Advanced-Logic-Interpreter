@@ -77,29 +77,40 @@
 
 
 ; TEST - fetch
-(define P 'X)
-(define Q 'Y)
+;(define P 'X)
+;(define Q 'Y)
 
 ;; (-x V Y)
 ;; -(x ^ -y)
 
-(define input (make-imply P Q))
+;(define input (make-imply P Q))
 ;; no V and no =>
+
+
+;((x v y) v y)
+
+(define (opp input)
+  (cond ((not(atom? (first-operand input))) (simplify? (first-operand input)))
+        ((not(atom? (first-operand input))) (simplify? (first-operand input)))))
+
+
+;; -------------
 
 (define (simplify? input)
   (let ((operator (classifier input))) 
   (cond ((eq? operator 'v) (apply-demorgans input))
         ((eq? operator '=>) (apply-imply input))
-        (else #f))))
+        (else input))))
 
 ; demorgans
 ; get first opp, apply negative
 ; do same for 2nd opp,
 ; replce operator with and, then wrap entire list with negation
 
+
 (define (apply-demorgans input)
     (let ((first-op (first-operand input)) (second-op (second-operand input)))
-      (make-not (make-and (make-not first-op) (make-not first-op)))))
+      (make-not (make-and (make-not first-op) (make-not second-op)))))
 
 (define (apply-imply input)
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
@@ -107,62 +118,14 @@
 
 
 
+;(simplify? input)
+
+
+(define P (make-or 'x 'y))
+(define Q 'y)
+
+(define input (make-or P Q));
+(display input)
+(display "\n")
+
 (simplify? input)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;(define P (make-or 'x 'y))
-;(define Q (make-and (make-not 'x) 'y))
-
-;(define input (make-imply P Q));
-;(display input)
-
-
-;;;  [x → y] ⇛ (!x v y) 
-;
-;(define (simp input)
-;  (cond ((eq? '=> (classifier input))
-;         ((make-or (make-not (first-operand input)) (second-operand input))))
-;        
-;        (else #f)))
-;
-;
-;(display "\n")
-;
-;
-
-;
-;(display "Display Infos\n")
-;
-;(first-operand (make-and 'p1 'p2))    ;p1
-;(second-operand (make-and 'p1 'p2))   ;p2
-;(classifier (make-and 'p1 'p2))       ;^
-;
-;(make-not 'p1)
-
-
-
-
-
-
-
-;(define (make-and-list lst)
- ; (display lst)
-  ; )
-
-;(make-not 3 6)
-;(make-not (list '- 'p1) 'p2)
-;(make-and-list '(-2 v -2))
