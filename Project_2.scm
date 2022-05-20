@@ -51,8 +51,9 @@
 
 (define (remove-negative tree)
   (define (aux lst count)
+    ;(display "list: ") (display lst) (display ", count: ") (display count) (display "\n")
         (cond ((null? lst) lst)
-              ((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
+              ((atom? lst) (if (= (modulo count 2) 0)
                                                 (cons 'x '())
                                                 (cons '- (cons 'x '()))
                                                 ))
@@ -64,7 +65,11 @@
   (aux tree 0)
 )
 
-
+; 2nd condition with (x) and not just x
+;((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
+;                                                (cons 'x '())
+;                                                (cons '- (cons 'x '()))
+;                                                ))
 
 ;-------------fetch--------------;
 
@@ -78,16 +83,18 @@
   (cadr clauses))
 
 
-;; TEST - makes
-;(define x 2)
-;(define y 4)
-;(define z (make-not (make-not 'a))) ; (- a)
-;
+;-------------TEST MAKES--------------;
+(define x 2)
+(define y 4)
+
+(define z (make-not (make-not 'a)))
 ;(make-and x z)
-;
 ;(make-or x y)
 ;(make-not y)
-;(make-not z)
+z
+(make-not z)
+(remove-negative z)
+
 ;(make-imply z y)
 
 
@@ -118,13 +125,13 @@
 
 
 (define (opp input)
-  (cond ((not(atom? (first-operand input))) (simplify? (first-operand input)))
-        ((not(atom? (first-operand input))) (simplify? (se-operand input)))))
+  (cond ((not(atom? (first-operand input))) (apply-laws (first-operand input)))
+        ((not(atom? (first-operand input))) (apply-laws (se-operand input)))))
 
 
 ;; -------------
 
-(define (simplify? input)
+(define (apply-laws input)
   (let ((operator (classifier input))) 
   (cond ((eq? operator 'v) (apply-demorgans input))
         ((eq? operator '=>) (apply-imply input))
@@ -139,10 +146,10 @@
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
     (make-not (make-and first-op (make-not second-op)))))
 
-;(simplify? (make-or (make-not 'x) 'y))
-;(simplify? (make-or 'x 'y))
+;(apply-laws (make-or (make-not 'x) 'y))
+;(apply-laws (make-or 'x 'y))
 
-(define x (simplify? (make-or (make-not 'x) 'y)))
+(define x (apply-laws (make-or (make-not 'x) 'y)))
 
 
 ;(- (- x))--> #t
@@ -170,7 +177,7 @@
 
 ;;(display input)
 ;;(display "\n")
-;;(simplify? input)
+;;(apply-laws input)
 
 
 
@@ -184,7 +191,7 @@
 ;
 ;(display input)
 ;(display "\n")
-;(simplify? input)
+;(apply-laws input)
 ;
 ;;((x #t) (y #f))
 
