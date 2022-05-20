@@ -86,7 +86,8 @@
   (car clauses))
 
 (define (classifier clauses)
-  (cadr clauses))
+  (cond((atom? clauses) clauses)
+       (else (cadr clauses))))
 
 (define (second-operand clauses)
   (caddr clauses))
@@ -107,36 +108,43 @@
 ;;  input : (x v y) 
 (define (apply-laws input)
   (let ((operator (classifier input))) 
-    (cond ((not (= (length input) 3)) (display "Incorrect input. Required: <Operand Operator Operand>"))
+    (cond ((atom? input) input)
+          ((not (= (length input) 3)) (display "Incorrect input. Required: <Operand Operator Operand>"))
           ((eq? operator 'v) (apply-demorgans input))
           ((eq? operator '=>) (apply-imply input))
-          (else (display "Incorrent Operand Given")))))
+          (else input))))
 
-;; input: (x v y)
+;; input:  ((x v y) v y)
 (define (apply-demorgans input)
     (let ((first-op (first-operand input)) (second-op (second-operand input)))
-      (make-not (make-and (make-not first-op) (make-not second-op)))))
+      (make-not (make-and (make-not (simp-alt first-op)) (make-not (simp-alt second-op))))))
 
 (define (apply-imply input)
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
     (make-not (make-and first-op (make-not second-op)))))
 
-(define (apply-alt input)
-  (display (atom? (first-operand input) (second-operand input)))
-  (cond ((and (atom? (first-operand input) (second-operand input))) (apply-laws input))
-        (cons (car (apply-alt input)) (cdr (apply-alt input)))
-        )
 
-  )
+(define (simp-alt input)
+  (cond ((null? input) '())
+        ((atom? input) input)
+        (else (append (apply-laws input)))))
 
+(define gg (make-or (make-or 'x 'y) (make-or 'x 'y)))
+;; (x 
+;((x v y) v (x v y))
+;((- ((- x) ^ (- y))) v  (- ((- x) ^ (- y))) )
+;
+;(- (-  (- ((- x) ^ (- y)))) ^ (- (- ((- x) ^ (- y)))))
+;
+;(- ((- (- ((- x) ^ (- y)))) ^ (- (- ((- x) ^ (- y))))) )
 
+(apply-laws gg)
+               
 ; make a function that recognizes if its a pair of three,
 ; operator | oprand | operator
 ; if pair of three, applys laws, and go back
 ; if not pair of three, car deeper into the list
 
-;(define (recur-simp input)
-;  (
 
 (define (simplify-lst lst)
   (define (aux list-aux)
@@ -151,12 +159,12 @@
   
 )
 
-; Test 1 Simplify 
-(define x (make-or (make-or 'x 'y) 'y))
-x
-;; x = (-x V y)
-(define app-x (apply-laws x))
-(apply-alt x)
+;; Test 1 Simplify 
+;(define x (make-or (make-or 'x 'y) 'y))
+;;x
+;;; x = (-x V y)
+;(define app-x (apply-laws x))
+;;;(apply-alt x)
 
 ;;app-x
 ;;(simplify-lst x)
