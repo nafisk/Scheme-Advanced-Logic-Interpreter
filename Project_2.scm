@@ -18,6 +18,7 @@
 
 ; returns a list with a single negative or just the operand
 (define (remove-negative tree)
+  
   (define (aux lst count)
     ; (display "list: ") (display lst) (display ", count: ") (display count) (display "\n")
         (cond ((null? lst) lst)
@@ -34,6 +35,7 @@
 )
 
 ;; KEEP FOR NOW | DELETE IF r-n IS FINALIZED
+
 ; 2nd condition with (x) and not just x
 ;((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
 ;                                                (cons 'x '())
@@ -66,7 +68,7 @@
 
 ;; Type-1
 (define (make-not f)
-  (cons '- (cons f '())))
+  (cons '- (cons f '()))) 
 
 
 ; returns x and y with not(-)
@@ -83,23 +85,16 @@
 (define (first-operand clauses)
   (car clauses))
 
-(define (second-operand clauses)
-  (caddr clauses))
-
 (define (classifier clauses)
   (cadr clauses))
 
+(define (second-operand clauses)
+  (caddr clauses))
 
 
 
 
 ;-------------Operations--------------;
-
-;;;;;; WHY EVEN HAVE AN OOP? WHY DO WE NEED THIS?
-(define (opp input)
-  (cond ((not(atom? (first-operand input))) (apply-laws (first-operand input)))
-        ((not(atom? (first-operand input))) (apply-laws (se-operand input)))))
-
 
 ; 🌊 --- F L O W --- 🌊
 ; ~~~~~FRONT END FLOW~~~~~
@@ -109,8 +104,7 @@
 ; SIMPLIFY EACH OPERAND
 ; SEND TO BACK END FOR TRUTH VALUE
 
-
-
+;;  input : (x v y) 
 (define (apply-laws input)
   (let ((operator (classifier input))) 
     (cond ((not (= (length input) 3)) (display "Incorrect input. Required: <Operand Operator Operand>"))
@@ -118,7 +112,7 @@
           ((eq? operator '=>) (apply-imply input))
           (else (display "Incorrent Operand Given")))))
 
-
+;; input: (x v y)
 (define (apply-demorgans input)
     (let ((first-op (first-operand input)) (second-op (second-operand input)))
       (make-not (make-and (make-not first-op) (make-not second-op)))))
@@ -126,6 +120,23 @@
 (define (apply-imply input)
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
     (make-not (make-and first-op (make-not second-op)))))
+
+(define (apply-alt input)
+  (display (atom? (first-operand input) (second-operand input)))
+  (cond ((and (atom? (first-operand input) (second-operand input))) (apply-laws input))
+        (cons (car (apply-alt input)) (cdr (apply-alt input)))
+        )
+
+  )
+
+
+; make a function that recognizes if its a pair of three,
+; operator | oprand | operator
+; if pair of three, applys laws, and go back
+; if not pair of three, car deeper into the list
+
+;(define (recur-simp input)
+;  (
 
 (define (simplify-lst lst)
   (define (aux list-aux)
@@ -136,22 +147,28 @@
     )
   (cond ((eq? (car lst) '-) (cons '- (aux (car (cdr lst))) ))
         (else (aux lst)))
+  ;(aux lst)
+  
 )
 
 ; Test 1 Simplify 
-;(define x (make-or (make-not (make-not 'x)) 'y))
-;(define app-x (apply-laws x))
-;app-x
-;(simplify-lst x)
+(define x (make-or (make-or 'x 'y) 'y))
+x
+;; x = (-x V y)
+(define app-x (apply-laws x))
+(apply-alt x)
+
+;;app-x
+;;(simplify-lst x)
 
 ; Test 2 Simplify 
-(define y (make-or (make-not 'x) 'y))
-(define app-y (apply-laws y))
-app-y
-(simplify-lst app-y)
+;(define y (make-or (make-not 'x) 'y))
+;(define app-y (apply-laws y))
+;app-y
+;(simplify-lst app-y)
 
 
-(define x (apply-laws (make-or (make-not 'x) 'y)))
+; (define x (apply-laws (make-or (make-not 'x) 'y)))
 
 ;(simplify-lst x)
 
@@ -159,10 +176,24 @@ app-y
 ;(eq? (car '(- (- x))) (caar (cdr '(- (- x)))))
 
 
+
+
+
+
+
+
+
+
 (define (no-not input)
   (cond ((eq? (car input) (caar (cdr input))) (cadr (cadr input)))))
 
 ;(no-not '(- (- x)))
+
+
+;;;;;; WHY EVEN HAVE AN OOP? WHY DO WE NEED THIS?
+(define (opp input)
+  (cond ((not(atom? (first-operand input))) (apply-laws (first-operand input)))
+        ((not(atom? (first-operand input))) (apply-laws (se-operand input)))))
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------TESTING----------------------------------------------------------;
