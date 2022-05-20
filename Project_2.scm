@@ -16,10 +16,38 @@
   (and (not (null? x))
        (not (pair? x))))
 
+; returns a list with a single negative or just the operand
+(define (remove-negative tree)
+  (define (aux lst count)
+    ; (display "list: ") (display lst) (display ", count: ") (display count) (display "\n")
+        (cond ((null? lst) lst)
+              ((atom? lst) (if (= (modulo count 2) 0)
+                                                (cons lst '())
+                                                (cons '- (cons lst '()))
+                                                ))
+              (else (aux (car (cdr lst)) (if (equal? (car lst) '-)
+                                             (+ count 1)
+                                             count))))
+    )
+
+  (aux tree 0)
+)
+
+;; KEEP FOR NOW | DELETE IF r-n IS FINALIZED
+; 2nd condition with (x) and not just x
+;((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
+;                                                (cons 'x '())
+;                                                (cons '- (cons 'x '()))
+;                                                ))
+
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------Part 1-----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
+
+
+
+
 
 ;-------------makes--------------;
 
@@ -46,30 +74,9 @@
 ;  (cond ((not (atom? f)) (car (cdr f))) ; if an atom with negative/a list
 ;        (else (cons '- (cons f '()))))) ; if an atom
 
-(define f (cons 'x '()))
-(define testLst (make-not (make-not (make-not f))))
 
-(define (remove-negative tree)
-  (define (aux lst count)
-    ;(display "list: ") (display lst) (display ", count: ") (display count) (display "\n")
-        (cond ((null? lst) lst)
-              ((atom? lst) (if (= (modulo count 2) 0)
-                                                (cons 'x '())
-                                                (cons '- (cons 'x '()))
-                                                ))
-              (else (aux (car (cdr lst)) (if (equal? (car testLst) '-)
-                                             (+ count 1)
-                                             count))))
-    )
 
-  (aux tree 0)
-)
 
-; 2nd condition with (x) and not just x
-;((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
-;                                                (cons 'x '())
-;                                                (cons '- (cons 'x '()))
-;                                                ))
 
 ;-------------fetch--------------;
 
@@ -83,59 +90,33 @@
   (cadr clauses))
 
 
-;-------------TEST MAKES--------------;
-(define x 2)
-(define y 4)
-
-(define z (make-not (make-not 'a)))
-;(make-and x z)
-;(make-or x y)
-;(make-not y)
-z
-(make-not z)
-(remove-negative z)
-
-;(make-imply z y)
-
-
-; TEST - fetch
-;(define P 'X)
-;(define Q 'Y)
-
-;; (-x V Y)
-;; -(x ^ -y)
-
-;(define input (make-imply P Q))
-;; no V and no =>
-
-
-;((x v y) v y)
-
-;(-x v y): --> -(--x ^ -y) 
 
 
 
-; plan:
-; 1. get the smallest operand
-; 2. apply dem or imp
-; 3. simplify if there's -- beside each other
-; 4. recurse out and then do the bigger one
-; look up youtube cideos on how to traverse trees in scheme
-; findint he algebraic expressions interpreter whatever in the notes
+;-------------Operations--------------;
 
-
+;;;;;; WHY EVEN HAVE AN OOP? WHY DO WE NEED THIS?
 (define (opp input)
   (cond ((not(atom? (first-operand input))) (apply-laws (first-operand input)))
         ((not(atom? (first-operand input))) (apply-laws (se-operand input)))))
 
 
-;; -------------
+; 🌊 --- F L O W --- 🌊
+; ~~~~~FRONT END FLOW~~~~~
+; LET USER KNOW TO USE NEGATIVE WITH BRACKETS
+; TAKE IN INPUT
+; APPLY LAWS
+; SIMPLIFY EACH OPERAND
+; SEND TO BACK END FOR TRUTH VALUE
+
+
 
 (define (apply-laws input)
   (let ((operator (classifier input))) 
-  (cond ((eq? operator 'v) (apply-demorgans input))
-        ((eq? operator '=>) (apply-imply input))
-        (else input))))
+    (cond ((not (= (length input) 3)) (display "Incorrect input. Required: <Operand Operator Operand>"))
+          ((eq? operator 'v) (apply-demorgans input))
+          ((eq? operator '=>) (apply-imply input))
+          (else (display "Incorrent Operand Given")))))
 
 
 (define (apply-demorgans input)
@@ -146,11 +127,33 @@ z
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
     (make-not (make-and first-op (make-not second-op)))))
 
-;(apply-laws (make-or (make-not 'x) 'y))
-;(apply-laws (make-or 'x 'y))
+(define (simplify-lst lst)
+  (define (aux list-aux)
+    (cons (remove-negative (first-operand list-aux))
+          (cons (classifier list-aux)
+                (cons (remove-negative (second-operand list-aux)) '())
+                ))
+    )
+  (cond ((eq? (car lst) '-) (cons '- (aux (car (cdr lst))) ))
+        (else (aux lst)))
+)
+
+; Test 1 Simplify 
+;(define x (make-or (make-not (make-not 'x)) 'y))
+;(define app-x (apply-laws x))
+;app-x
+;(simplify-lst x)
+
+; Test 2 Simplify 
+(define y (make-or (make-not 'x) 'y))
+(define app-y (apply-laws y))
+app-y
+(simplify-lst app-y)
+
 
 (define x (apply-laws (make-or (make-not 'x) 'y)))
 
+;(simplify-lst x)
 
 ;(- (- x))--> #t
 ;(eq? (car '(- (- x))) (caar (cdr '(- (- x)))))
@@ -161,7 +164,39 @@ z
 
 ;(no-not '(- (- x)))
 
+;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------TESTING----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
 
+
+
+
+
+; --- TESTING VARS ---
+;(define x 2)
+;(define y 4)
+;(define z (make-not (make-not 'a)))
+
+;; --- MAKE TEST ---
+;(make-and x z)
+;(make-or x y)
+;(make-not y)
+;(make-not z)
+;(make-imply z y)
+
+;; --- HELPER TEST ---
+; (remove-negative (make-not (make-not (make-not (make-not (make-not (make-not z)))))))
+
+;; --- MAKE FETCH ---
+;(define P 'X)
+;(define Q 'Y)
+;(define input (make-imply P Q))
+
+;; trying to make
+; (-x V Y)
+; -(x ^ -y)
+;((x v y) v y)
+;(-x v y): --> -(--x ^ -y)
 
 
 
@@ -206,3 +241,10 @@ z
 ;; -(#t)
 ;; #f
 
+; plan:
+; 1. get the smallest operand
+; 2. apply dem or imp
+; 3. simplify if there's -- beside each other
+; 4. recurse out and then do the bigger one
+; look up youtube cideos on how to traverse trees in scheme
+; findint he algebraic expressions interpreter whatever in the notes
