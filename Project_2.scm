@@ -32,6 +32,9 @@
 (define (make-or f s)
   (cons f (cons 'v (cons s '() ))))
 
+; returns x and y with implies(=>)
+(define (make-imply f s)
+  (cons f (cons '=> (cons s '() ))))
 
 ;; Type-1
 (define (make-not f)
@@ -39,16 +42,28 @@
 
 
 ; returns x and y with not(-)
-;(define (make-not f) 
+;(define (make-not-a f) 
 ;  (cond ((not (atom? f)) (car (cdr f))) ; if an atom with negative/a list
 ;        (else (cons '- (cons f '()))))) ; if an atom
 
+(define f (cons 'x '()))
+(define testLst (make-not (make-not (make-not f))))
 
+(define (remove-negative tree)
+  (define (aux lst count)
+        (cond ((null? lst) lst)
+              ((not (eq? (car lst) '-)) (if (= (modulo count 2) 0)
+                                                (cons 'x '())
+                                                (cons '- (cons 'x '()))
+                                                ))
+              (else (aux (car (cdr lst)) (if (equal? (car testLst) '-)
+                                             (+ count 1)
+                                             count))))
+    )
 
+  (aux tree 0)
+)
 
-; returns x and y with implies(=>)
-(define (make-imply f s)
-  (cons f (cons '=> (cons s '() ))))
 
 
 ;-------------fetch--------------;
@@ -124,7 +139,7 @@
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
     (make-not (make-and first-op (make-not second-op)))))
 
-(simplify? (make-or (make-not 'x) 'y))
+;(simplify? (make-or (make-not 'x) 'y))
 ;(simplify? (make-or 'x 'y))
 
 (define x (simplify? (make-or (make-not 'x) 'y)))
@@ -137,7 +152,7 @@
 (define (no-not input)
   (cond ((eq? (car input) (caar (cdr input))) (cadr (cadr input)))))
 
-(no-not '(- (- x)))
+;(no-not '(- (- x)))
 
 
 
