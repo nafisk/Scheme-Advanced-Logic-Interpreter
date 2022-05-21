@@ -74,44 +74,34 @@
 (define (simplify input)
   (let ((operator (classifier input))) 
     (cond ((atom? input) input)
-          ;((not (= (length input) 3)) "") ;(display "Incorrect input. Required: <Operand Operator Operand>\n")
+          ((eq? (car input) '-) input)
           ((eq? operator 'v) (apply-demorgans input))
           ((eq? operator '=>) (apply-imply input))
-          (else input))))
-
-
-
-;; 🛑🛑🛑🛑------- FIX ^^ FOR AND -------🛑🛑🛑🛑 ;;
-
-
-
-
-
-
-
+          (else (make-and (simplify (first-operand input)) (simplify (second-operand input))))))) ;;AND finxed
 
 
 (define (apply-demorgans input)
+ ;; (display input) (display "\n")
     (let ((first-op (first-operand input)) (second-op (second-operand input)))
-      (make-not (make-and (make-not (simp-alt first-op)) (make-not (simp-alt second-op))))))
+      (make-not (make-and (make-not (simplify first-op)) (make-not (simplify second-op))))))
 
+ 
 (define (apply-imply input)
   (let ((first-op (first-operand input)) (second-op (second-operand input)))
-    (make-not (make-and first-op (make-not second-op)))))
+    (make-not (make-and (simplify first-op) (make-not (simplify second-op))))))
 
 
-
-
-
-;; PLEASE CHANGE NAME 🛑🛑🛑🛑🛑
-(define (simp-alt input)
-  (cond ((null? input) '())
-        ((atom? input) input)
-        (else (append (simplify input)))))
-
-
-
-
+;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------Backend----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
+;; (make-not (make-and x (make-not 'y))))
+;; ((x #t) (y #f))
+;; 
+;; -(x ^ -y)
+;; -(#t ^ -#f)
+;; -(#t ^ #t)
+;; -(#t)
+;; #f
 
 ;;;;;; INPUT??? ;;;;;;;;;
 (define truth-vals '())
@@ -122,7 +112,7 @@
   (simplify a)
   )
 
-(calc-result '(x ^ y) '((x t) (y f)))
+(calc-result '(x ^ y) '((x #t) (y #f)))
 
 
 
@@ -131,9 +121,6 @@
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------TESTING----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
-
-
-
 
 
 ; --- TESTING VARS ---
@@ -166,18 +153,14 @@
 
 
 
+;; EXTRA STUFF
 
 
+;; PLEASE CHANGE NAME 🛑🛑🛑🛑🛑
+(define (simp-alt input)
+  (cond ((null? input) '())
+        ((atom? input) input)
+        (else (append (simplify input)))))
 
 
-
-;; Backend ----------------------------------------------------
-;; (make-not (make-and x (make-not 'y))))
-;; ((x #t) (y #f))
-;; 
-;; -(x ^ -y)
-;; -(#t ^ -#f)
-;; -(#t ^ #t)
-;; -(#t)
-;; #f
 
