@@ -16,13 +16,6 @@ I ask that each team submit a single document containing the developments, proof
 
 Design a data type suitable for representing infix propositions, as described in my notes for Class 19.
 
-- [ ] Input Proposition: ^
-- [ ] Input Proposition: v
-- [ ] Input Proposition: -
-- [ ] Input Proposition: =>
-- [ ] Proofs
-Returns the local equivalent proposition of using ^ and - only in infix notation. 
-
 Give a complete specification and development (including a proof) for a program which inputs a proposition
 which uses and (^), or (v), not (-) and implies (=>) and which returns a logically equivalent proposition
 using just ^ and - .  Both the input and output should use infix notation.
