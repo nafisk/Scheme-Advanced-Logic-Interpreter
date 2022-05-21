@@ -74,7 +74,7 @@
 (define (simplify input)
   (let ((operator (classifier input))) 
     (cond ((atom? input) input)
-          ((eq? (car input) '-) input)
+          ((eq? (car input) '-) (make-not (simplify (cadr input))))
           ((eq? operator 'v) (apply-demorgans input))
           ((eq? operator '=>) (apply-imply input))
           (else (make-and (simplify (first-operand input)) (simplify (second-operand input))))))) ;;AND finxed
@@ -94,6 +94,48 @@
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------Backend----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
+
+
+(define asso-list '((x #f) (y #t)))
+
+
+(define (lookup input)
+  (define (aux lst)
+    (cond ((null? lst) (display "Couldn't Found"))
+          ((eq? input (caar lst)) (cadr(car lst)))
+          (else (aux (cdr lst)))))
+    (aux asso-list))
+
+
+
+(define (myeval input)
+  (cond ((atom? input) (lookup input))
+        ((eq? (car input) '-) (not (myeval (cadr input))))
+        (else (and (myeval (first-operand input))
+                   (myeval (second-operand input))))))
+
+
+
+;; Ex Test:
+;; '(x v y) --> (F v t) --> T
+
+(myeval (simplify '(x v y))) ;;--> COreetly returns T
+(myeval (simplify '(x => y))) ;; correty returns T
+(myeval (simplify '((x v y) v y))) ;; -->correctly T
+(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
+
+
+
+
+
+
+
+
+
+
+
+
+
 ;; (make-not (make-and x (make-not 'y))))
 ;; ((x #t) (y #f))
 ;; 
@@ -112,7 +154,7 @@
   (simplify a)
   )
 
-(calc-result '(x ^ y) '((x #t) (y #f)))
+;(calc-result '(x ^ y) '((x #t) (y #f)))
 
 
 
@@ -157,10 +199,12 @@
 
 
 ;; PLEASE CHANGE NAME 🛑🛑🛑🛑🛑
-(define (simp-alt input)
-  (cond ((null? input) '())
-        ((atom? input) input)
-        (else (append (simplify input)))))
-
-
+;(define (simp-alt input)
+;  (cond ((null? input) '())
+;        ((atom? input) input)
+;        (else (append (simplify input)))))
+;
+;
+;
+;
 
