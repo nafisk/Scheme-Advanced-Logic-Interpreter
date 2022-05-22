@@ -96,8 +96,8 @@
 ;-----------------------------------------------------------------------------------------------------------------------;
 
 
-(define asso-list '((x #f) (y #t)))
-
+; (define asso-list '((x #f) (y #t)))
+(define asso-list '())
 
 (define (lookup input)
   (define (aux lst)
@@ -116,48 +116,15 @@
 
 
 
-;; Ex Test:
-;; '(x v y) --> (F v t) --> T
 
-(myeval (simplify '(x v y))) ;;--> COreetly returns T
-(myeval (simplify '(x => y))) ;; correty returns T
-(myeval (simplify '((x v y) v y))) ;; -->correctly T
-(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
+;; INTRODUCTION CALL
+(define (evaluate-preposition x y)
+  (set! asso-list y)
+  (myeval (simplify x))
+ )
 
-
-
-
-
-
-
-
-
-
-
-
-
-;; (make-not (make-and x (make-not 'y))))
-;; ((x #t) (y #f))
-;; 
-;; -(x ^ -y)
-;; -(#t ^ -#f)
-;; -(#t ^ #t)
-;; -(#t)
-;; #f
-
-;;;;;; INPUT??? ;;;;;;;;;
-(define truth-vals '())
-; a: (x ^ y)
-; b: ((x t) (y f))
-(define (calc-result a b)
-  (append b truth-vals)
-  (simplify a)
-  )
-
-;(calc-result '(x ^ y) '((x #t) (y #f)))
-
-
-
+; test
+(evaluate-preposition '((x ^ y) v (x ^ y)) '((x #t) (y #f)) )
 
 
 ;-----------------------------------------------------------------------------------------------------------------------;
@@ -193,18 +160,12 @@
 ;(define gg (make-or (make-or (make-not 'x) 'y) (make-or 'x 'y)))
 ;(simplify gg)
 
+;; -- EVALUATION --
+;; '(x v y) --> (F v t) --> T
+;(myeval (simplify '(x v y))) ;;--> COreetly returns T
+;(myeval (simplify '(x => y))) ;; correty returns T
+;(myeval (simplify '((x v y) v y))) ;; -->correctly T
+;(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
 
-
-;; EXTRA STUFF
-
-
-;; PLEASE CHANGE NAME 🛑🛑🛑🛑🛑
-;(define (simp-alt input)
-;  (cond ((null? input) '())
-;        ((atom? input) input)
-;        (else (append (simplify input)))))
-;
-;
-;
-;
-
+;; -- INTRODUCTION --
+;(evaluate-preposition '(((x ^ y) v (x ^ y)) ((x #t) (y #f))) )
