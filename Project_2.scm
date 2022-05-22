@@ -49,8 +49,6 @@
 
 
 
-
-
 ;-------------fetch--------------;
 
 
@@ -70,66 +68,122 @@
 
 ;-------------Operations--------------;
 
-;;  input : (x v y) 
-(define (simplify input)
-  (let ((operator (classifier input))) 
-    (cond ((atom? input) input)
-          ((eq? (car input) '-) (make-not (simplify (cadr input))))
-          ((eq? operator 'v) (apply-demorgans input))
-          ((eq? operator '=>) (apply-imply input))
-          (else (make-and (simplify (first-operand input)) (simplify (second-operand input))))))) ;;AND finxed
+;  input : (x v y)
+
+(define (interpreter proposition alist)
+
+  (define (simplify input)
+    (let ((operator (classifier input))) 
+      (cond ((atom? input) input)
+            ((eq? (car input) '-) (make-not (simplify (cadr input))))
+            ((eq? operator 'v)    (apply-demorgans (simplify (first-operand input)) (simplify (second-operand input))))
+            ((eq? operator '=>)   (apply-imply     (simplify (first-operand input)) (simplify (second-operand input))))
+            (else                 (make-and (simplify (first-operand input)) (simplify (second-operand input)))))))
 
 
-(define (apply-demorgans input)
- ;; (display input) (display "\n")
-    (let ((first-op (first-operand input)) (second-op (second-operand input)))
-      (make-not (make-and (make-not (simplify first-op)) (make-not (simplify second-op))))))
+
+  ; Cdring down the list... return atokm, empty?
+  ;; Terminate
+
+  (define (apply-demorgans x y)
+    (make-not (make-and (make-not x)
+                        (make-not y))))
 
  
-(define (apply-imply input)
-  (let ((first-op (first-operand input)) (second-op (second-operand input)))
-    (make-not (make-and (simplify first-op) (make-not (simplify second-op))))))
-
+  (define (apply-imply x y)
+    (make-not (make-and x (make-not y))))
+  
+  (evaluator (simplify proposition) alist))
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------Backend----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
 
+(define (evaluator input asso-list)
 
-; (define asso-list '((x #f) (y #t)))
-(define asso-list '())
-
-(define (lookup input)
-  (define (aux lst)
-    (cond ((null? lst) (display "Couldn't Found"))
-          ((eq? input (caar lst)) (cadr(car lst)))
-          (else (aux (cdr lst)))))
+  (define (lookup input)
+    (define (aux lst)
+      (cond ((null? lst) '())
+            ((eq? input (caar lst)) (cadr(car lst)))
+            (else (aux (cdr lst)))))
     (aux asso-list))
 
 
 
-(define (myeval input)
-  (cond ((atom? input) (lookup input))
-        ((eq? (car input) '-) (not (myeval (cadr input))))
-        (else (and (myeval (first-operand input))
-                   (myeval (second-operand input))))))
+  (define (myeval input)
+    (cond ((atom? input) (lookup input))
+          ((eq? (car input) '-) (not (myeval (cadr input))))
+          (else (and (myeval (first-operand input))
+                     (myeval (second-operand input))))))
 
-
-
-
-;; INTRODUCTION CALL
-(define (evaluate-preposition x y)
-  (set! asso-list y)
-  (myeval (simplify x))
- )
-
-; test
-(evaluate-preposition '((x ^ y) v (x ^ y)) '((x #t) (y #f)) )
+(myeval input))
 
 
 ;-----------------------------------------------------------------------------------------------------------------------;
-;------------------------------------------------------TESTING----------------------------------------------------------;
+;------------------------------------------------------Part-3 Testing ----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
+
+;; Ex Test:
+(interpreter '(x v y)       '((x #f) (y #t) (z #t)))
+(interpreter '(x => y)      '((x #f) (y #t) (z #t)))
+(interpreter '((x v y) v y) '((x #f) (y #t) (z #t)))
+(interpreter '((x ^ y) v (x ^ y)) '((x #f) (y #t) (z #t)))
+(interpreter '((- (x ^ y)) ^ z)   '((x #f) (y #t) (z #t)))
+(interpreter '(x ^ y)       '((x #t) (y #t) ))
+
+
+
+
+;(myeval (simplify '(x v y))) ;;--> COreetly returns T
+;(myeval (simplify '(x => y))) ;; correty returns T
+;(myeval (simplify '((x v y) v y))) ;; -->correctly T
+;(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
+;(myeval '((- (x ^ y)) ^ z))  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------GARBAGE----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
+;; (make-not (make-and x (make-not 'y))))
+;; ((x #t) (y #f))
+;; 
+;; -(x ^ -y)
+;; -(#t ^ -#f)
+;; -(#t ^ #t)
+;; -(#t)
+;; #f
+
+;;;;;; INPUT??? ;;;;;;;;;
+;(define truth-vals '())
+;; a: (x ^ y)
+;; b: ((x t) (y f))
+;(define (calc-result a b)
+;  (append b truth-vals)
+;  (simplify a)
+;  )
+
+;(calc-result '(x ^ y) '((x #t) (y #f)))
 
 
 ; --- TESTING VARS ---
@@ -160,12 +214,18 @@
 ;(define gg (make-or (make-or (make-not 'x) 'y) (make-or 'x 'y)))
 ;(simplify gg)
 
-;; -- EVALUATION --
-;; '(x v y) --> (F v t) --> T
-;(myeval (simplify '(x v y))) ;;--> COreetly returns T
-;(myeval (simplify '(x => y))) ;; correty returns T
-;(myeval (simplify '((x v y) v y))) ;; -->correctly T
-;(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
 
-;; -- INTRODUCTION --
-;(evaluate-preposition '(((x ^ y) v (x ^ y)) ((x #t) (y #f))) )
+
+;; EXTRA STUFF
+
+
+;; PLEASE CHANGE NAME 🛑🛑🛑🛑🛑
+;(define (simp-alt input)
+;  (cond ((null? input) '())
+;        ((atom? input) input)
+;        (else (append (simplify input)))))
+;
+;
+;
+;
+
