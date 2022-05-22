@@ -70,7 +70,7 @@
 
 ;  input : (x v y)
 
-(define (interpreter proposition alist)
+(define (simplify-propositions proposition)
 
   (define (simplify input)
     (let ((operator (classifier input))) 
@@ -91,15 +91,16 @@
 
  
   (define (apply-imply x y)
-    (make-not (make-and x (make-not y))))
+    (make-not (make-and x
+                        (make-not y))))
   
-  (evaluator (simplify proposition) alist))
+  (simplify proposition))
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------Backend----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
 
-(define (evaluator input asso-list)
+(define (evaluator simp-prop asso-list)
 
   (define (lookup input)
     (define (aux lst)
@@ -110,29 +111,33 @@
 
 
 
-  (define (myeval input)
-    (cond ((atom? input) (lookup input))
-          ((eq? (car input) '-) (not (myeval (cadr input))))
-          (else (and (myeval (first-operand input))
-                     (myeval (second-operand input))))))
+  (define (myeval simp-prop)
+    (cond ((atom? simp-prop) (lookup simp-prop))
+          ((eq? (car simp-prop) '-) (not (myeval (cadr simp-prop))))
+          (else (and (myeval (first-operand simp-prop))
+                     (myeval (second-operand simp-prop))))))
 
-(myeval input))
+(myeval simp-prop))
 
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 ;------------------------------------------------------Part-3 Testing ----------------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
 
+(define (interpreter input-prop asso-list)
+  (evaluator (simplify-propositions input-prop)
+             asso-list))
+
 ;; Ex Test:
+
 (interpreter '(x v y)       '((x #f) (y #t) (z #t)))
 (interpreter '(x => y)      '((x #f) (y #t) (z #t)))
 (interpreter '((x v y) v y) '((x #f) (y #t) (z #t)))
 (interpreter '((x ^ y) v (x ^ y)) '((x #f) (y #t) (z #t)))
 (interpreter '((- (x ^ y)) ^ z)   '((x #f) (y #t) (z #t)))
-(interpreter '(x ^ y)       '((x #t) (y #t) ))
-
-
-
+(interpreter '(x ^ y)       '((x #f) (y #t) ))
+(interpreter '((- x) ^ ((x ^ (x v y)) v (y v x))) '((x #f) (y #t) ))
+(interpreter '(- x) '((x #f)))
 
 ;(myeval (simplify '(x v y))) ;;--> COreetly returns T
 ;(myeval (simplify '(x => y))) ;; correty returns T
