@@ -213,10 +213,7 @@
 ; (second-operand '((x ^ y) v (x => y)))
 ; Correct: (x ^ y)
 
-;-----------------------------------------------------------------------------------------------------------------------;
-;------------------------------------------------------Backend----------------------------------------------------------;
-;-----------------------------------------------------------------------------------------------------------------------;
-
+; --------------------------------------------------------------------------------------------------------------------------------------;
 
 ; Let us now look at a structual induction of the interpreter:
 
@@ -287,7 +284,7 @@
 
 
 ; Pre-Condition: Given a propositional stament
-; Post: Returns the a simplified version of the propositional input without ^ or =>
+; Post: Returns the a simplified version of the propositional input without v or =>
 
 (define (simplify-propositions proposition)
 
