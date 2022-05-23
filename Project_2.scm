@@ -214,6 +214,77 @@
 ; Correct: (x ^ y)
 
 ;-----------------------------------------------------------------------------------------------------------------------;
+;------------------------------------------------------Backend----------------------------------------------------------;
+;-----------------------------------------------------------------------------------------------------------------------;
+
+
+; Let us now look at a structual induction of the interpreter:
+
+; Pre-condition: The precondition for the interpreter is, given a list, containing a proposition which uses and(^), or(v),
+; not(-) and implies(=>), and an association-list that contains a list of variables-value pairs with one entry per variable
+; for all available variables in the proposition. It is also worthy to note that, the propositions are built using the infix
+; notation with one clause on the left of the operator, and one clause on the right of the operator. 
+;
+; Post Condition: It will return computed the logical truth value of the input proposition using alist values for its variables.
+;
+; Let is now see the proper components of the input, for which we can induct on. We can say that the class of P_k of propositions
+; over the set K of proposition variables is the least class containing T, F, and each variable k ∈ K, which is closed under
+; ^, V, -, and =>. 
+; So, 
+; If, X, Y  ∈ P_k, then
+;
+; (X ^ Y)  ∈ P_k
+; (X v Y)  ∈ P_k
+; (- X)  ∈ P_k
+; (X => y) ∈ P_k,
+;
+; Similarly, we can also get more complex components by making each operand a new sub-component. So, for (X v Y) ^ (X v Z), the
+; components are X, Y, Z, (X v Y), (X v Z). Note that: ), (, =>, ^ are alone not a proper component as it doesn’t fit our
+; definition of P_k above. 
+;
+; Now, as per the specification of the project, the front-end of the interpreter should return a logically equivalent proposition
+; using just ^ and -, and without using or(v),  imply(=>). We can proof using structural induction that any proposition written
+; using the operators ^, V, -, => is equivalent to a proposition using using just ^ and - . 
+;
+; Basis: In the basis step, we see our interpreter returns T,F, and which are  k ∈ K. Since it belongs to our definition, we can
+; say basis step is true. 
+;
+; IH: We assume that our recursive call returns the logical eqivelance proposition, given that we provided all proper components
+; to the recursive call. 
+;
+; IS: In the inductive step, we need to consider all the possible cases for a proposition P. 
+; P = (X ^ Y)
+; P = (X v Y)
+; P = (- R)
+; P = (X => Y)
+;
+; (Case1) 
+; P = (X ^ Y) → From IH, we can see, provided a propoper component X, there is a logically equivalent proposition X’, where X’ is
+; expressed using only ^ and - operator.
+; Using the same logic, provided a propoper component Y, there is a logically equivalent proposition Y’, where Y’ is expressed
+; using only ^ and - operator.
+; Here we clearly see if X’ and Y’ both propositional components match the specification(i.e. no v/=>), it is clear that X’ ^ Y’
+; is indeed the right answer. 
+;
+; (Case2) 
+; P = (X v Y) → From IH, we can see, provided a propoper component X, and Y, there is a logically equivalent proposition X’, Y’,
+; where X’ is expressed using only ^ and - operator.
+;
+; But here we need to do a bit of extra work, namely, we can use demorgan’s law to simplify the v case. So, 
+; X’ v Y’ = - ((- X’) ^ (- Y’))
+; (Case 3) 
+; P = - X→ Similarly, from IH we get an X’ which is expressed using only the (^) and (-) operator. Which we can then return as
+; (-  X’), as it is already in its proper condition. 
+;
+; (Case-4)
+; (P= X => Y) From IH, we can see, provided a propoper component X, and Y, we will get a logically equivalent proposition X’, Y’,
+; where X’ is expressed using only ^ and - operator.
+;
+; But here we need to do a bit of extra work, namely, we can use the simplification law to simplify the implication(=>). So, 
+; X’ => Y’ = -(X’ ^ (- Y’))
+; Here we clearly see if X’ and Y’ both propositional components match the specification(i.e. no v/=>), it is clear that -(X’ ^ (- Y’))
+; is indeed the right answer. 
+
 
 ; Pre-Condition: Given a propositional stament
 ; Post: Returns the a simplified version of the propositional input without ^ or =>
@@ -324,7 +395,7 @@
           (else (and (myeval (first-operand simp-prop))
                      (myeval (second-operand simp-prop))))))
 
-(myeval simp-prop)
+(myeval simp-prop
   )
 
 
@@ -332,70 +403,6 @@
 ;------------------------------------------------------Part-3 Testing --------------------------------------------------;
 ;-----------------------------------------------------------------------------------------------------------------------;
 
-; Pre-condition: The precondition for the interpreter is, given a list, containing a proposition which uses and(^), or(v),
-; not(-) and implies(=>), and an association-list that contains a list of variables-value pairs with one entry per variable
-; for all available variables in the proposition. It is also worthy to note that, the propositions are built using the infix
-; notation with one clause on the left of the operator, and one clause on the right of the operator. 
-;
-; Post Condition: It will return computed the logical truth value of the input proposition using alist values for its variables.
-;
-; Let is now see the proper components of the input, for which we can induct on. We can say that the class of P_k of propositions
-; over the set K of proposition variables is the least class containing T, F, and each variable k ∈ K, which is closed under
-; ^, V, -, and =>. 
-; So, 
-; If, X, Y  ∈ P_k, then
-;
-; (X ^ Y)  ∈ P_k
-; (X v Y)  ∈ P_k
-; (- X)  ∈ P_k
-; (X => y) ∈ P_k,
-;
-; Similarly, we can also get more complex components by making each operand a new sub-component. So, for (X v Y) ^ (X v Z), the
-; components are X, Y, Z, (X v Y), (X v Z). Note that: ), (, =>, ^ are alone not a proper component as it doesn’t fit our
-; definition of P_k above. 
-;
-; Now, as per the specification of the project, the front-end of the interpreter should return a logically equivalent proposition
-; using just ^ and -, and without using or(v),  imply(=>). We can proof using structural induction that any proposition written
-; using the operators ^, V, -, => is equivalent to a proposition using using just ^ and - . 
-;
-; Basis: In the basis step, we see our interpreter returns T,F, and which are  k ∈ K. Since it belongs to our definition, we can
-; say basis step is true. 
-;
-; IH: We assume that our recursive call returns the logical eqivelance proposition, given that we provided all proper components
-; to the recursive call. 
-;
-; IS: In the inductive step, we need to consider all the possible cases for a proposition P. 
-; P = (X ^ Y)
-; P = (X v Y)
-; P = (- R)
-; P = (X => Y)
-;
-; (Case1) 
-; P = (X ^ Y) → From IH, we can see, provided a propoper component X, there is a logically equivalent proposition X’, where X’ is
-; expressed using only ^ and - operator.
-; Using the same logic, provided a propoper component Y, there is a logically equivalent proposition Y’, where Y’ is expressed
-; using only ^ and - operator.
-; Here we clearly see if X’ and Y’ both propositional components match the specification(i.e. no v/=>), it is clear that X’ ^ Y’
-; is indeed the right answer. 
-;
-; (Case2) 
-; P = (X v Y) → From IH, we can see, provided a propoper component X, and Y, there is a logically equivalent proposition X’, Y’,
-; where X’ is expressed using only ^ and - operator.
-;
-; But here we need to do a bit of extra work, namely, we can use demorgan’s law to simplify the v case. So, 
-; X’ v Y’ = - ((- X’) ^ (- Y’))
-; (Case 3) 
-; P = - X→ Similarly, from IH we get an X’ which is expressed using only the (^) and (-) operator. Which we can then return as
-; (-  X’), as it is already in its proper condition. 
-;
-; (Case-4)
-; (P= X => Y) From IH, we can see, provided a propoper component X, and Y, we will get a logically equivalent proposition X’, Y’,
-; where X’ is expressed using only ^ and - operator.
-;
-; But here we need to do a bit of extra work, namely, we can use the simplification law to simplify the implication(=>). So, 
-; X’ => Y’ = -(X’ ^ (- Y’))
-; Here we clearly see if X’ and Y’ both propositional components match the specification(i.e. no v/=>), it is clear that -(X’ ^ (- Y’))
-; is indeed the right answer. 
 
 
 (define (interpreter input-prop asso-list)
@@ -429,6 +436,3 @@
 
 
 ;; (make-not (make-and x (make-not 'y))))
-
-
-
