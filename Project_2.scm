@@ -353,17 +353,21 @@
 (define (evaluator simp-prop asso-list)
 
   ; Pre-condition: Given an look-up variables that exist on the simplified proposition, 
-  ; Post-condition: Returns the truth value of the look-up variable from the association-list that contains a list of variable-value pairs with one entry per variable.  
+  ; Post-condition: Returns the truth value of the look-up variable from the association-list that contains a list of variable-value
+  ; pairs with one entry per variable.  
   ; Ex: (alist = ((x #t) (x #f) (z #f)) ) 
   ;
-  ; We can write an iterative function for this problem. A design idea for an iterative program is to consider the list in two parts, the car and the cdr of the list. In the iterative process, we will extract the caar of the list, and compare it with our lookup value, and if found return the appropriate truth value. Otherwise, we will cdr down the list by passing the cdr of the list to the next call. 
+  ; We can write an iterative function for this problem. A design idea for an iterative program is to consider the list in two parts,
+  ; the car and the cdr of the list. In the iterative process, we will extract the caar of the list, and compare it with our lookup value,
+  ; and if found return the appropriate truth value. Otherwise, we will cdr down the list by passing the cdr of the list to the next call. 
   ; gI: Let us consider a variable, ASSO-LIST, which represents the original input of our function, and thus not changing. 
   ; The gI holds, if input ∈ ASSO-LIST, implies that, <=⇒ input also ∈ asso-list, where asso-list is the formal parameter
   ;
   ; Weak Enough?: Since, list input == ASSO-LIST on start, the gI becomes, input ∈ ASSO-LIST if and only if, input  ∈ ASSO-LIST. 
   ; Strong Enough?: Let us consider the termination condition of the function. The function can terminate, 
-  ; (null? asso-list) means we are given an empty list, which implies that, since, input ∉ ASSO-LIST , we know that p can’t belong to list s, input  ∉ asso-list, and it is correct to return #F. 
-  ; On the other hand, if input belongs to the cdr of the asso-list,  input ∈ (car asso-list), then a also belongs to ASSO-LIST, input ∈ ASSO-LIST, which is the list at the beginning of the call, and the function will stop and correctly return #T.   
+  ; (null? asso-list) means we are given an empty list, which implies that, since, input ∉ ASSO-LIST , we know that p can’t belong to list s,
+  ; input  ∉ asso-list, and it is correct to return #F. On the other hand, if input belongs to the cdr of the asso-list,  input ∈ (car asso-list),
+  ; then a also belongs to ASSO-LIST, input ∈ ASSO-LIST, which is the list at the beginning of the call, and the function will stop and correctly return #T.   
   ; Preservable?: In ord
   
   (define (lookup input)
@@ -375,19 +379,25 @@
 
 ;-----------------------------------------------------------------------------------------------------------------------;
 
-  ; Pre-condition:  Given a proposition, which has already been simplified using the front-end(Part-1), that has only and(^) and not(-) as its operator in infix notation.
+  ; Pre-condition:  Given a proposition, which has already been simplified using the front-end(Part-1), that has only and(^) and not(-) as its operator
+  ; in infix notation.
   ; Post-Condition: it returns the truth value of the simplified-proposition or the original input proposition. 
   ;
   ; Let us build a divide and conquer strategy for this function. We will be inducting on the length of the simp-prop list and its variables. 
   ;
-  ; Basis Step: We stop recursion when we reach the inner variable of simp-prop, which is an atom. Once we reach the variable in the simp-prop list, we can return the truth value of the variable using the lookup function. 
+  ; Basis Step: We stop recursion when we reach the inner variable of simp-prop, which is an atom. Once we reach the variable in the simp-prop list,
+  ; we can return the truth value of the variable using the lookup function. 
   ;
   ; IH: It can be seen in two ways,
-  ; Given that our pre-condition satisfies, that means the, simp-prop is a proper component of P_k, We assume that the call (myeval (first-operand simp-prop)) returns the truth value of the first-operand of the input proposition, (first-operand simp-prop),  by evaluating all the variables that exist in the operand by applying logical(scheme primitive) AND and NOT operation. Same argument applies for the second-operand of the simp-prop proposition. 
-  ; Also, (- P) is also a proper component of the P_k, so, given we have a not in our component, the function call, (myeval (cadr simp-prop)), returns the truth value of the component P,  by evaluating all the variables that exist in the proposition. 
+  ; Given that our pre-condition satisfies, that means the, simp-prop is a proper component of P_k, We assume that the call (myeval (first-operand simp-prop))
+  ; returns the truth value of the first-operand of the input proposition, (first-operand simp-prop),  by evaluating all the variables that exist in the
+  ; operand by applying logical(scheme primitive) AND and NOT operation. Same argument applies for the second-operand of the simp-prop proposition. 
+  ; Also, (- P) is also a proper component of the P_k, so, given we have a not in our component, the function call, (myeval (cadr simp-prop)), returns
+  ; the truth value of the component P,  by evaluating all the variables that exist in the proposition. 
   ;
   ; IS:  We can see that the precondition satisfies, since return the truth value smallest unit of the proposition: (atom? simp-prop) (lookup simp-prop). 
-  ; So, the code handles the result of the recursive call in 2 ways, it either applies primitive NOT to the result of the recursive call, (myeval (cadr simp-prop)), or, it applies the primitive AND to the result of the recursive call to the first and second operand. Thus, computing the truth value of the input proposition. 
+  ; So, the code handles the result of the recursive call in 2 ways, it either applies primitive NOT to the result of the recursive call, (myeval (cadr simp-prop)),
+  ; or, it applies the primitive AND to the result of the recursive call to the first and second operand. Thus, computing the truth value of the input proposition. 
 
   (define (myeval simp-prop)
     (cond ((atom? simp-prop) (lookup simp-prop))
@@ -395,8 +405,8 @@
           (else (and (myeval (first-operand simp-prop))
                      (myeval (second-operand simp-prop))))))
 
-(myeval simp-prop
-  )
+(myeval simp-prop)
+)
 
 
 ;-----------------------------------------------------------------------------------------------------------------------;
@@ -419,20 +429,3 @@
 ;(interpreter '((- x) ^ ((x ^ (x v y)) v (y v x))) '((x #f) (y #t) )) ; #t
 ;(interpreter '(- x) '((x #f))) ; #t
 
-
-
-
-
-;-----------------------------------------------------------------------------------------------------------------------;
-;------------------------------------------------------GARBAGE----------------------------------------------------------;
-;-----------------------------------------------------------------------------------------------------------------------;
-
-
-;(myeval (simplify '(x v y))) ;;--> COreetly returns T
-;(myeval (simplify '(x => y))) ;; correty returns T
-;(myeval (simplify '((x v y) v y))) ;; -->correctly T
-;(myeval (simplify '((x ^ y) v (x ^ y)))) ;;Correltly returns #f
-;(myeval '((- (x ^ y)) ^ z))  
-
-
-;; (make-not (make-and x (make-not 'y))))
