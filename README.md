@@ -58,10 +58,6 @@ The package includes a series of tests to ensure the reliability and correctness
 - Nafis Khan (Email: nkhan014@citymail.cuny.edu)
 - Deepankar Chakraborty (Email: dchakra001@citymail.cuny.edu)
 
-## Acknowledgments
-
-Developed under the guidance of Professor Douglas Troeger, CSC 33500 – Programming Language Paradigms, The City College of New York, Computer Science Department.
-
 ---
 
 Note: This README provides a basic guide for the Scheme List Interpreter. For detailed documentation, refer to the comments and documentation within the source code. 
