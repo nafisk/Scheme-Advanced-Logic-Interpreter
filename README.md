@@ -64,4 +64,6 @@ Developed under the guidance of Professor Douglas Troeger, CSC 33500 – Program
 
 ---
 
-Note: This README provides a basic guide for the Scheme List Interpreter. For detailed documentation, refer to the comments and documentation within the source code.
+Note: This README provides a basic guide for the Scheme List Interpreter. For detailed documentation, refer to the comments and documentation within the source code. 
+
+© 2023 Nafis Khan. All Rights Reserved.
