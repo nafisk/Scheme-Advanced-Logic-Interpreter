@@ -1,7 +1,5 @@
 # Scheme List Interpreter
 
-## Introduction
-
 The Scheme List Interpreter is a comprehensive package designed for handling propositional logic using Scheme's functions, syntax, and primitives. It is particularly adept at dealing with propositional expressions that need simplification and boolean evaluation.
 
 ## Features
